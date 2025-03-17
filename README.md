@@ -13,11 +13,8 @@ pip install requests
 
 3) Running the Script: To test generating tokens for all tenants (default): python script.py. 
 
-4) Expected Output for the different statuses: 
-
----------------- \<Tenant> is enabled, on regional url: \<regional_url> --------------- (This will be green)
-
----------------- This tenant is not enabled (Realm not available) for \<tenant> ---------------- (This will be red)
+4) Expected Output:
+- A csv with Tenant Name, Status, Regional URL
 
 ## Code Overview 
 ``` 

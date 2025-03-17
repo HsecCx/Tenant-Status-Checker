@@ -97,6 +97,7 @@ if __name__ == "__main__":
                     "enabled": result["enabled"], 
                     "regional_url": result["regional_url"]
                 })
+                tenants_status_list = sorted(tenants_status_list, key=lambda x: (not x["enabled"], x["tenant"]))
             except Exception as e:
                 print(f"Error processing tenant {tenant}: {e}")
 
