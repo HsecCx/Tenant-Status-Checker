@@ -16,6 +16,8 @@ def get_target_tenant_configs(target_tenants: str | list = "all"):
     return relevant_configs
 
 if __name__ == "__main__":
+    #Example for a specific tenant, this can be a string or a list the default is all tenants in the config file. MAKE SURE THE NAME IS CORRECT(case sensitive) for specific tenants.
+    #configs = get_target_tenant_configs(target_tenants="target-tenant-name")
     configs = get_target_tenant_configs()
     for config in configs:
         print("-" * 15)
