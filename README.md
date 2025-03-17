@@ -9,7 +9,7 @@
 1) Install Dependencies: 
 pip install requests 
 
-2) Update tenants.txt to have alkl your tenants you want to check for. Seperate each tenant by a line break
+2) !!Update or create tenants.txt to have all your tenants you want to check for!!. Seperate each tenant by a line break
 
 3) Running the Script: To test generating tokens for all tenants (default): python script.py. 
 
