@@ -1,5 +1,5 @@
 ## Tenant OAuth Token Generator 
-- This script is used to generate OAuth tokens for multiple Checkmarx AST tenants by reading configurations from a config file. It supports retrieving tokens for all tenants or specific ones, with color-coded console output for better visibility. 
+- This script is used to test tenants to see if they are still live. It outputs a CSV letting you know if the tenant is enabled or not. 
 
 ## Features 
 - Retrieve OAuth tokens for all tenants or specific ones. - Color-coded output: Green (token successfully generated), Yellow (invalid refresh token), Red (tenant not enabled). - Reads tenant configurations from ALL_CONFIGS. - Supports single and multiple tenant filtering.
