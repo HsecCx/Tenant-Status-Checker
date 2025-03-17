@@ -1,13 +1,13 @@
 import requests,json
 from pathlib import Path
 
-def load_config(config_file=Path("config.json").resolve()):
+def load_tenants(tenants_file=Path("tenants.txt").resolve()):
     """Loads configuration values from a JSON file."""
     
-    with open(config_file, "r") as file:
-        return json.load(file)
+    with open(tenants_file, "r") as file:
+        return file.read().splitlines()
 
-def generate_oauth_token_test(config):
+def generate_oauth_token_test(iam_url: str, tenant: str):
     """
     Generates an OAuth token using the provided API key.
 
@@ -17,7 +17,7 @@ def generate_oauth_token_test(config):
     Returns:
         str: The OAuth token if successful, or an error message if not.
     """
-    url = f"{config['iam_url']}{config['tenant_name']}/protocol/openid-connect/token"
+    url = f"{iam_url}/auth/realms/{tenant}/protocol/openid-connect/token"
     data = {
         "grant_type": "refresh_token",
         "client_id": "ast-app",

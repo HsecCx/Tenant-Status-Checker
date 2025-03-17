@@ -9,39 +9,21 @@
 1) Install Dependencies: 
 pip install requests 
 
-2) Update Configuration: Make sure your tenant configurations are correctly defined in your config file. 
+2) Update tenants.txt to have alkl your tenants you want to check for. Seperate each tenant by a line break
 
-3) Running the Script: To generate tokens for all tenants (default): python script.py. 
-
-    - To generate a token for a specific tenant: configs = get_target_tenant_configs(target_tenants="target-tenant-name"). 
-
-    - To generate tokens for multiple tenants: configs = get_target_tenant_configs(target_tenants=["tenant1","tenant2"]). 
+3) Running the Script: To test generating tokens for all tenants (default): python script.py. 
 
 4) Expected Output for the different statuses: 
 
----------------- \<Tenant> is enabled but the refresh token is invalid --------------- (This will be green)
+---------------- \<Tenant> is enabled, on regional url: \<regional_url> --------------- (This will be green)
 
----------------- This tenant is not enabled (Realm not available) for tenant2 ---------------- (This will be red)
-
-## Configuration Structure Your tenant configuration should be structured as follows: 
-
-```
-{"tenants":
-    [
-    {"api_url":"https://<subdomain>.ast.checkmarx.net/api",
-    "iam_url":"https://<subdomain>.iam.checkmarx.net/auth/realms/",
-    "tenant_name":"<tenant_name>"}
-    ]
-    
-}
-```
-
+---------------- This tenant is not enabled (Realm not available) for \<tenant> ---------------- (This will be red)
 
 ## Code Overview 
 ``` 
-get_target_tenant_configs(target_tenants: str | list = "all"):
+def check_for_tenant_in_all_regtions(tenant: str) -> dict:
 ```
-Filters tenants based on the provided target_tenants (single string or list). Returns all tenants if "all" is provided. - generate_oauth_token(config): Generates the OAuth token for a given tenant using the provided configuration. 
+Checks if the tenants in the tenant.txt file exist on any regional url
 
 - Color Legend: GREEN (\033[32m) → Tenant is enabled (refresh token is inconsequential for checking if the tenant is enabled) 
 - RED (\033[31m) → Tenant not enabled, RESET (\033[0m) → Resets color. ## Credits - Developed by [Your Name].
