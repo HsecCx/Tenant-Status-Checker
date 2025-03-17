@@ -19,11 +19,9 @@ pip install requests
 
 4) Expected Output for the different statuses: 
 
----------------- Successfully generated token for tenant1. This tenant is enabled --------------- 
+---------------- \<Tenant> is enabled but the refresh token is invalid --------------- (This will be green)
 
----------------- This tenant is not enabled (Realm not available) for tenant2 ----------------
-
---------------- tenant3 is enabled but the refresh token is invalid --------------- 
+---------------- This tenant is not enabled (Realm not available) for tenant2 ---------------- (This will be red)
 
 ## Configuration Structure Your tenant configuration should be structured as follows: 
 
@@ -32,7 +30,6 @@ pip install requests
     [
     {"api_url":"https://<subdomain>.ast.checkmarx.net/api",
     "iam_url":"https://<subdomain>.iam.checkmarx.net/auth/realms/",
-    "api_key":"<apikey>",
     "tenant_name":"<tenant_name>"}
     ]
     
@@ -46,6 +43,5 @@ get_target_tenant_configs(target_tenants: str | list = "all"):
 ```
 Filters tenants based on the provided target_tenants (single string or list). Returns all tenants if "all" is provided. - generate_oauth_token(config): Generates the OAuth token for a given tenant using the provided configuration. 
 
-- Color Legend: GREEN (\033[32m) → Token generated successfully, 
-- YELLOW (\033[33m) → Invalid refresh token, 
-- RED (\033[31m) → Tenant not enabled, RESET (\033[0m) → Resets color. ## Credits - Developed by [Your Name]. Uses 
+- Color Legend: GREEN (\033[32m) → Tenant is enabled (refresh token is inconsequential for checking if the tenant is enabled) 
+- RED (\033[31m) → Tenant not enabled, RESET (\033[0m) → Resets color. ## Credits - Developed by [Your Name].

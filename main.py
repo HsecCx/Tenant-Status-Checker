@@ -1,4 +1,4 @@
-from utils.generate_oauth_token import generate_oauth_token,load_config
+from utils.test_tenant_enabled import generate_oauth_token_test,load_config
 
 ALL_CONFIGS = load_config()
 colors = {
@@ -21,14 +21,13 @@ if __name__ == "__main__":
     configs = get_target_tenant_configs()
     for config in configs:
         print("-" * 15)
-        oauth_token = generate_oauth_token(config)
-        if "Error" not in oauth_token:
-            print(f"{colors['GREEN']}Successfully generated token for {config['tenant_name']}. This tenant is enabled{colors['RESET']}")
+        oauth_token = generate_oauth_token_test(config)
+        if "realm not enabled" in oauth_token.lower():
+            #We can assume that the tenant is not enabled.
+            print(f"{colors['RED']}This tenant is not enabled (Realm not available) for {config['tenant_name']}{colors['RESET']}")
+        #The tenant is enabled. Refresh token is inconsequential in this for testing if the tenant is active. 
+        elif "invalid refresh token" in oauth_token.lower():
+            print(f"{colors['GREEN']}{config['tenant_name']} is enabled{colors['RESET']}")
         else:
-            if "realm not enabled" in oauth_token.lower():
-                print(f"{colors['RED']}This tenant is not enabled (Realm not available) for {config['tenant_name']}{colors['RESET']}")
-            elif "invalid refresh token" in oauth_token.lower():
-                print(f"{colors['YELLOW']}{config['tenant_name']} is enabled but the refresh token is invalid{colors['RESET']}")
-            else:
-                print(oauth_token)
+            print(oauth_token)
         print("-" * 15)

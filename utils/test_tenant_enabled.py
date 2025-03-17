@@ -7,7 +7,7 @@ def load_config(config_file=Path("config.json").resolve()):
     with open(config_file, "r") as file:
         return json.load(file)
 
-def generate_oauth_token(config):
+def generate_oauth_token_test(config):
     """
     Generates an OAuth token using the provided API key.
 
@@ -21,7 +21,7 @@ def generate_oauth_token(config):
     data = {
         "grant_type": "refresh_token",
         "client_id": "ast-app",
-        "refresh_token": config["api_key"]
+        "refresh_token": " "
     }
     response = requests.post(url, data=data)
     if response.status_code == 200:
