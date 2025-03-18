@@ -9,6 +9,21 @@ base_urls = [
     "https://us.iam.checkmarx.net"
 ]
 
+# All URLs if needed
+# base_urls = [
+#     "https://iam.checkmarx.net",
+#     "https://us.iam.checkmarx.net",
+#     "https://eu.iam.checkmarx.net",
+#     "https://eu-2.iam.checkmarx.net",
+#     "https://deu.iam.checkmarx.net",
+#     "https://anz.iam.checkmarx.net",
+#     "https://ind.iam.checkmarx.net",
+#     "https://sng.iam.checkmarx.net",
+#     "https://mea.iam.checkmarx.net"
+# ]
+
+
+
 def check_for_tenant_in_all_regions(tenant: str) -> tuple:
     """Checks if a tenant is enabled across all base URLs concurrently."""
     tenant_enabled = False
@@ -65,5 +80,5 @@ if __name__ == "__main__":
             print("Finished checking tenant: ", tenant)
             print("\n\n")
 
-    # Convert tuples to dictionaries before writing to file
+  
     write_data(tenants_status_list)
