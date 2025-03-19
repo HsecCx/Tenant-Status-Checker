@@ -4,13 +4,13 @@ from utils.test_tenant_enabled import generate_oauth_token_test, load_tenants
 tenants = load_tenants()
 
 # Only US.
-base_urls = [
-    "https://iam.checkmarx.net",
-    "https://us.iam.checkmarx.net"
-]
+# base_iam_urls = [
+#     "https://iam.checkmarx.net",
+#     "https://us.iam.checkmarx.net"
+# ]
 
 # All URLs if needed
-# base_urls = [
+# base_iam_urls = [
 #     "https://iam.checkmarx.net",
 #     "https://us.iam.checkmarx.net",
 #     "https://eu.iam.checkmarx.net",
@@ -22,15 +22,46 @@ base_urls = [
 #     "https://mea.iam.checkmarx.net"
 # ]
 
+base_iam_urls = {
+    "US": [
+        "https://iam.checkmarx.net",
+        "https://us.iam.checkmarx.net"
+    ],
+    "EU": [
+        "https://eu.iam.checkmarx.net",
+        "https://eu-2.iam.checkmarx.net"
+    ],
+    "DEU": "https://deu.iam.checkmarx.net",
+    "ANZ": "https://anz.iam.checkmarx.net",
+    "IND": "https://ind.iam.checkmarx.net",
+    "SNG": "https://sng.iam.checkmarx.net",
+    "UAE": "https://mea.iam.checkmarx.net"
+}
+
+def get_relevant_iam_urls(regions: list | str = "US") -> list:
+    """Returns the relevant IAM URLs based on the provided regions."""
+    if isinstance(regions, str):
+        return base_iam_urls.get(regions, [])
+    elif isinstance(regions, list):
+        urls = []
+        for region in regions:
+            if region in base_iam_urls:
+                if isinstance(base_iam_urls[region], list):
+                    urls.extend(base_iam_urls[region])
+                else:
+                    urls.append(base_iam_urls[region])
+        return urls
+    return []
 
 
-def check_for_tenant_in_all_regions(tenant: str) -> tuple:
+def check_for_tenant_in_regions(tenant: str, regions: list | str = "US") -> tuple:
     """Checks if a tenant is enabled across all base URLs concurrently."""
     tenant_enabled = False
     found_url = ""
-
+    regions = regions if isinstance(regions, list) else [regions]
+    relevant_iam_urls = get_relevant_iam_urls(regions)
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = {executor.submit(generate_oauth_token_test, base_url, tenant): base_url for base_url in base_urls}
+        futures = {executor.submit(generate_oauth_token_test, base_url, tenant): base_url for base_url in relevant_iam_urls}
 
         for future in concurrent.futures.as_completed(futures):
             base_url = futures[future]
@@ -60,9 +91,10 @@ def write_data(status_list: list) -> None:
 if __name__ == "__main__":
     tenants_status_set = set()
     MAX_THREADS = 8
-
+    # all_regions = ["US", "EU", "DEU", "ANZ", "IND", "SNG", "UAE"]
+    target_regions = ["US"]
     with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
-        future_to_tenant = {executor.submit(check_for_tenant_in_all_regions, tenant): tenant for tenant in tenants}
+        future_to_tenant = {executor.submit(check_for_tenant_in_regions, tenant, target_regions): tenant for tenant in tenants}
 
         for future in concurrent.futures.as_completed(future_to_tenant):
             tenant = future_to_tenant[future]
