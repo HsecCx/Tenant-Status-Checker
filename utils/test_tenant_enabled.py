@@ -1,13 +1,11 @@
 import requests,json
 from pathlib import Path
 
-def load_tenants(tenants_file=Path("tenants.txt").resolve()):
-    """Loads configuration values from a JSON file."""
-    
+def load_tenants(tenants_file=Path("tenants.txt").resolve()) -> list:
     with open(tenants_file, "r") as file:
-        return file.read().splitlines()
-
-def generate_oauth_token_test(iam_url: str, tenant: str):
+        return list(dict.fromkeys(file.read().splitlines()))
+    
+def generate_oauth_token_test(iam_url: str, tenant: str) -> str:
     """
     Generates an OAuth token using the provided API key.
 
