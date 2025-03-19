@@ -1,13 +1,11 @@
 import concurrent.futures
 import logging
+import argparse
 from pathlib import Path
 from utils.test_tenant_enabled import generate_oauth_token_test, load_tenants
 
 # Configure logging format and level
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
-# Load tenant data
-tenants = load_tenants()
 
 # Mapping of IAM base URLs by region
 base_iam_urls = {
@@ -19,6 +17,14 @@ base_iam_urls = {
     "SNG": ["https://sng.iam.checkmarx.net"],
     "UAE": ["https://mea.iam.checkmarx.net"],
 }
+
+colors = {
+     "GREEN":"\033[32m",
+     "YELLOW":"\033[33m",
+     "RED":"\033[31m",
+     "RESET":"\033[0m"
+     }
+ 
 
 def get_relevant_iam_urls(regions: list | str = "US") -> list:
     """
@@ -44,7 +50,6 @@ def check_for_tenant_in_regions(tenant: str, regions: list | str = "US", multi_r
     relevant_iam_urls = get_relevant_iam_urls(regions)
     found_urls = []
 
-    # Run IAM checks concurrently for the given tenant
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = {executor.submit(generate_oauth_token_test, url, tenant): url for url in relevant_iam_urls}
 
@@ -61,32 +66,47 @@ def check_for_tenant_in_regions(tenant: str, regions: list | str = "US", multi_r
             except Exception as e:
                 logging.error(f"Error checking {tenant} on {url}: {e}")
 
-    return tenant, bool(found_urls), tuple(found_urls)  # Ensure URLs are returned as a tuple for consistency
+    return tenant, bool(found_urls), tuple(found_urls)
 
-def write_data(status_list: list[tuple], output_file_path="tenant_status.csv") -> None:
+def write_data(status_list: list, file_path="tenant_status.csv") -> None:
     """
     Writes tenant status data to a CSV file.
 
     :param status_list: A list of tuples containing tenant status data.
                         Each tuple follows (tenant, status, regional URLs).
-    :param output_file_path: The file path where the CSV will be written.
+    :param file_path: The file path where the CSV will be written.
                       Defaults to "tenant_status.csv".
     """
-    output_file_path = Path(output_file_path).resolve()
+    file_path = Path(file_path).resolve()
     headers = ["Tenant", "Status", "Regional URL"]
 
-    # Write headers and tenant status data to CSV
-    with output_file_path.open("w+", encoding="utf-8") as f:
+    with file_path.open("w+", encoding="utf-8") as f:
         f.write(",".join(headers) + "\n")
         for tenant, status, urls in status_list:
             regional_url = "|".join(urls) if urls else "N/A"
             f.write(f"{tenant},{status},{regional_url}\n")
 
+def parse_arguments():
+    """
+    Parses command-line arguments for tenant filtering.
+    
+    :return: List of tenant names provided via command-line, or an empty list if none.
+    """
+    parser = argparse.ArgumentParser(description="Check if tenants are enabled in different IAM regions.")
+    parser.add_argument(
+        "--tenants", nargs="+", help="List of tenant names to check (space-separated)."
+    )
+    return parser.parse_args()
+
 if __name__ == "__main__":
+    args = parse_arguments()
+
+    # Load all tenants unless specific ones are provided via arguments
+    tenants = args.tenants if args.tenants else load_tenants()
+
     tenants_status_set = set()
     MAX_THREADS = 8
-    # target_regions = ["US", "EU", "DEU", "ANZ", "IND", "SNG", "UAE"]
-    target_regions = "US"
+    target_regions = ["US", "EU", "DEU", "ANZ", "IND", "SNG", "UAE"]
 
     # Execute IAM checks concurrently for all tenants
     with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
@@ -101,11 +121,25 @@ if __name__ == "__main__":
 
             try:
                 result = future.result()
-                tenants_status_set.add(result)  # Add result to the set
+                tenants_status_set.add(result)
             except Exception as e:
                 logging.error(f"Error processing tenant {tenant}: {e}")
 
             logging.info(f"Finished checking tenant: {tenant}")
 
+    # Sort results before writing
+    tenants_status_list = sorted(tenants_status_set, key=lambda x: (not x[1], x[0]))
+
     # Write results to CSV
-    write_data(sorted(tenants_status_set, key=lambda x: (not x[1], x[0])))
+    write_data(tenants_status_list)
+
+    # Print results to console
+    if args.tenants:
+        print("\n--- Tenant Check Results ---")
+        for tenant, status, urls in tenants_status_list:
+            status_str = "Enabled" if status else "Disabled"
+            regional_url = "|".join(urls) if urls else "N/A"
+            if status_str == "Enabled":
+                print(f"{colors['GREEN']}Tenant: {tenant}, Status: {status_str}, Regional URL(s): {regional_url}{colors['RESET']}")
+            else:
+                print(f"{colors['RED']}Tenant: {tenant}, Status: {status_str}, Regional URL(s): {regional_url}{colors['RESET']}")
