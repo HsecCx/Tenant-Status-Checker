@@ -1,26 +1,9 @@
 import concurrent.futures
 from utils.test_tenant_enabled import generate_oauth_token_test, load_tenants
-
+import logging
 tenants = load_tenants()
 
-# Only US.
-# base_iam_urls = [
-#     "https://iam.checkmarx.net",
-#     "https://us.iam.checkmarx.net"
-# ]
-
-# All URLs if needed
-# base_iam_urls = [
-#     "https://iam.checkmarx.net",
-#     "https://us.iam.checkmarx.net",
-#     "https://eu.iam.checkmarx.net",
-#     "https://eu-2.iam.checkmarx.net",
-#     "https://deu.iam.checkmarx.net",
-#     "https://anz.iam.checkmarx.net",
-#     "https://ind.iam.checkmarx.net",
-#     "https://sng.iam.checkmarx.net",
-#     "https://mea.iam.checkmarx.net"
-# ]
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 base_iam_urls = {
     "US": [
@@ -91,26 +74,21 @@ def write_data(status_list: list) -> None:
 if __name__ == "__main__":
     tenants_status_set = set()
     MAX_THREADS = 8
-    # all_regions = ["US", "EU", "DEU", "ANZ", "IND", "SNG", "UAE"]
+    # target_regions = ["US", "EU", "DEU", "ANZ", "IND", "SNG", "UAE"]
     target_regions = ["US"]
     with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
         future_to_tenant = {executor.submit(check_for_tenant_in_regions, tenant, target_regions): tenant for tenant in tenants}
 
         for future in concurrent.futures.as_completed(future_to_tenant):
             tenant = future_to_tenant[future]
-            print("Running, checking tenant: ", tenant)  
+            logging.info(f"Running, checking tenant: {tenant}")  
 
             try:
                 result = future.result()
-                tenants_status_set.add(result)  # Set ensures uniqueness
-
-                # Correct sorting of tuples
+                tenants_status_set.add(result) 
                 tenants_status_list = sorted(tenants_status_set, key=lambda x: (not x[1] ,x[0]))
             except Exception as e:
-                print(f"Error processing tenant {tenant}: {e}")
-
-            print("Finished checking tenant: ", tenant)
-            print("\n\n")
-
+                logging.info(f"Error processing tenant {tenant}: {e}")
+            logging.info(f"Finished checking tenant: {tenant}")
   
     write_data(tenants_status_list)
