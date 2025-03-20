@@ -16,10 +16,10 @@ pip install requests
 
 3) Running the Script: To test generating tokens for all tenants (default):
   ```
-  python main.py
+  python check_tenant_enablement.py
 ```
 ```
-python.py main.py --tenants <tenant1> <tenant2>
+python.py check_tenant_enablement.py --tenants <tenant1> <tenant2>
 ```
 
 5) Expected Output:
