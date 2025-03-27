@@ -33,13 +33,13 @@ pip install -r requirements.txt
 
 ```
 # Check tenants across all regions (default)
-python script.py --tenants acme checkmate testco
+python check_tenant_enablement.py --tenants acme checkmate testco
 
 # Check tenants only in US and EU regions
-python script.py --tenants acme checkmate --regions US EU
+python check_tenant_enablement.py --tenants acme checkmate --regions US EU
 
 # Limit the number of threads
-python script.py --tenants acme --max_threads 4
+python check_tenant_enablement.py --tenants acme --max_threads 4
 ```
 
 If no `--tenants` argument is passed, the script will read from a `tenants.txt` file in the same directory.
@@ -52,7 +52,7 @@ The output will be saved to `tenant_status.csv`.
 
 ```
 tenant-iam-checker/
-├── script.py           # Main script
+├── check_tenant_enablement.py           # Main script
 ├── tenants.txt         # Optional file listing tenants to check
 ├── tenant_status.csv   # Output CSV with status results
 ├── README.md           # Project overview and usage guide
