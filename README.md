@@ -1,27 +1,66 @@
-## Tenant OAuth Token Generator 
-- This script is used to test tenants to see if they are still live. It outputs a CSV letting you know if the tenant is enabled or not.
+# Project Title: Tenant IAM Region Checker
 
-## Features 
-- Retrieve OAuth tokens for all tenants or specific ones. 
-- Color-coded output: Green (tenant enabled),Red (tenant not enabled). 
-- Reads tenant configurations from tenants.txt or can take them as cli arguments. - Supports single and multiple tenant filtering.
+A concurrent Python script that verifies whether specific Checkmarx tenants are enabled in different IAM regional endpoints. Useful for automation, diagnostics, or validation across cloud regions.
 
-## Usage 
+---
 
-1) Install Dependencies: 
-pip install requests 
+# 🚀 Features
 
-2) **Either pass the tenants as CLI args or update or create tenants.txt to have all your tenants you want to check for** 
-    - Seperate each tenant by a line break in the tenants file or as a space when passing as the argument --tenants
+- Checks if a tenant is enabled across multiple IAM regions
+- Multi-threaded for fast performance
+- Automatically writes results to a CSV file
+- Supports filtering by tenant and region
+- Highlights results in the console with color-coded output
 
-3) Running the Script: To test generating tokens for all tenants (default):
-  ```
-  python check_tenant_enablement.py
+---
+
+# 🛠️ Installation
+
+Make sure you have Python 3.8+ installed and install the required dependencies (if any).
+
 ```
-```
-python.py check_tenant_enablement.py --tenants <tenant1> <tenant2>
+# Clone the repository
+git clone https://github.com/your-username/tenant-iam-checker.git
+cd tenant-iam-checker
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-5) Expected Output:
-- A csv with Tenant Name, Status, Regional URL(s)
-- If passed by cli, there will also be ouput in the console
+---
+
+# 💡 Usage
+
+```
+# Check tenants across all regions (default)
+python script.py --tenants acme checkmate testco
+
+# Check tenants only in US and EU regions
+python script.py --tenants acme checkmate --regions US EU
+
+# Limit the number of threads
+python script.py --tenants acme --max_threads 4
+```
+
+If no `--tenants` argument is passed, the script will read from a `tenants.txt` file in the same directory.
+
+The output will be saved to `tenant_status.csv`.
+
+---
+
+# 📁 Project Structure
+
+```
+tenant-iam-checker/
+├── script.py           # Main script
+├── tenants.txt         # Optional file listing tenants to check
+├── tenant_status.csv   # Output CSV with status results
+├── README.md           # Project overview and usage guide
+```
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License.
+
