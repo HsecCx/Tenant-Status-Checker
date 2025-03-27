@@ -159,7 +159,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Check if tenants are enabled in different IAM regions.")
     parser.add_argument("--tenants", nargs="+", help="List of tenant names to check (space-separated).")
     parser.add_argument("--regions", nargs="+", type=region_type, default="ALL", help="List of regions to check (space-separated).")
-    parser.add_argument("--max_threads", type=safe_thread_count, default=min(1,MAX_RECOMMENDED_THREADS),  help=f"Maximum number of threads to use (1 to {MAX_RECOMMENDED_THREADS}, based on {CPU_CORES} CPUs).")
+    parser.add_argument("--max_threads", type=safe_thread_count, default=min(5,MAX_RECOMMENDED_THREADS),  help=f"Maximum number of threads to use (1 to {MAX_RECOMMENDED_THREADS}, based on {CPU_CORES} CPUs).")
     return parser.parse_args()
 
 if __name__ == "__main__":
