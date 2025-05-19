@@ -90,7 +90,7 @@ def normalize_regions(regions) -> list:
     return list(BASE_IAM_URLS.keys()) if "ALL" in normalized else normalized
 
 
-def check_for_tenant_in_regions(tenant: str, regions: list | str = "US", multi_region_output: bool = False) -> tuple:
+def check_for_tenant_in_regions(tenant: str, regions: list | str, multi_region_output: bool = False) -> tuple:
     """
     Checks if a tenant is enabled across target IAM base URLs concurrently.
 
@@ -160,6 +160,7 @@ def parse_arguments():
     parser.add_argument("--tenants", nargs="+", help="List of tenant names to check (space-separated).")
     parser.add_argument("--regions", nargs="+", type=region_type, default="ALL", help="List of regions to check (space-separated).")
     parser.add_argument("--max_threads", type=safe_thread_count, default=min(5,MAX_RECOMMENDED_THREADS),  help=f"Maximum number of threads to use (1 to {MAX_RECOMMENDED_THREADS}, based on {CPU_CORES} CPUs).")
+    parser.add_argument("--multi_region_tenant_check", type=bool, default=True,  help=f"This will continue to check regions for tenants even after the first region has been detected. Options: (True or False). The default is True")
     return parser.parse_args()
 
 if __name__ == "__main__":
@@ -172,10 +173,11 @@ if __name__ == "__main__":
     MAX_THREADS = args.max_threads if args.max_threads else 8
     target_regions = args.regions ## We default to all regions if not specified. Default is set in the parse_arguments function.
     normalized_target_regions = normalize_regions(target_regions)
+    multi_region_tenant_output = args.multi_region_tenant_check
     # Execute IAM checks concurrently for all tenants
     with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
         future_to_tenant = {
-            executor.submit(check_for_tenant_in_regions, tenant, normalized_target_regions, True): tenant
+            executor.submit(check_for_tenant_in_regions, tenant, normalized_target_regions, multi_region_tenant_output): tenant
             for tenant in tenants
         }
 
